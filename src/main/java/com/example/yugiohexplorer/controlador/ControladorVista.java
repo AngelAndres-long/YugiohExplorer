@@ -3,10 +3,15 @@ package com.example.yugiohexplorer.controlador;
 import com.example.yugiohexplorer.modelo.Carta;
 import com.example.yugiohexplorer.modelo.ListaCircularDoble;
 import com.example.yugiohexplorer.modelo.TipoAtributo;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Controla la carga de las cartas y el manejo de las listas circulares.
@@ -30,7 +35,9 @@ public class ControladorVista{
     private ListaCircularDoble<Carta> listaTrap;
 
     private ListaCircularDoble<Carta> listaActual;
+    private ListaCircularDoble<Carta> listaBase;
     private int indiceActual=0;
+    private MediaPlayer reproductor;
 
     public ControladorVista(){
         listaTodas=new ListaCircularDoble<>();
@@ -49,8 +56,11 @@ public class ControladorVista{
         listaSpell=new ListaCircularDoble<>();
         listaTrap=new ListaCircularDoble<>();
 
-        cargarCSV("src/main/resources/imagenes/yugioh_cards.csv");
+        cargarCSV("src/main/java/com/example/yugiohexplorer/modelo/yugioh.csv");
+        ordenarListas();
         listaActual=listaTodas;
+        listaBase=listaTodas;
+        iniciarMusica();
     }
 
     //Carga las cartas desde el CSV
@@ -103,6 +113,61 @@ public class ControladorVista{
         }
     }
 
+    //Ordena las listas de nivel, ataque y defensa
+    private void ordenarListas(){
+        ordenarLista(listaNivelMenorMayor,Carta.POR_NIVEL);
+        ordenarLista(listaNivelMayorMenor,Carta.POR_NIVEL.reversed());
+        ordenarLista(listaAtaqueMenorMayor,Carta.POR_ATAQUE);
+        ordenarLista(listaAtaqueMayorMenor,Carta.POR_ATAQUE.reversed());
+        ordenarLista(listaDefensaMenorMayor,Carta.POR_DEFENSA);
+        ordenarLista(listaDefensaMayorMenor,Carta.POR_DEFENSA.reversed());
+    }
+
+    //Ordena una lista circular usando un ArrayList temporal
+    private void ordenarLista(ListaCircularDoble<Carta> lista,Comparator<Carta> comparador){
+        if(lista.estaVacia()) return;
+
+        ArrayList<Carta> temp=new ArrayList<>();
+        int n=lista.contar();
+        for(int i=0;i<n;i++){
+            temp.add(lista.obtener(i));
+        }
+
+        Collections.sort(temp,comparador);
+
+        while(!lista.estaVacia()){
+            lista.eliminaInicio();
+        }
+
+        for(Carta c:temp){
+            lista.insertaFinal(c);
+        }
+    }
+
+    //Inicia la música en loop
+    private void iniciarMusica(){
+        try{
+            Media media=new Media(getClass().getResource("/audio/passionate_duelist_hd.mp3").toExternalForm());
+            reproductor=new MediaPlayer(media);
+            reproductor.setCycleCount(MediaPlayer.INDEFINITE);
+            reproductor.play();
+        }catch(Exception e){
+            System.err.println("No se pudo cargar la música");
+        }
+    }
+
+    public void silenciar(){
+        if(reproductor!=null){
+            reproductor.pause();
+        }
+    }
+
+    public void activarSonido(){
+        if(reproductor!=null){
+            reproductor.play();
+        }
+    }
+
     public ListaCircularDoble<Carta> getListaActual(){
         return listaActual;
     }
@@ -113,19 +178,89 @@ public class ControladorVista{
 
     public void setListaActual(ListaCircularDoble<Carta> lista){
         this.listaActual=lista;
+        this.listaBase=lista;
         this.indiceActual=0;
     }
 
     public void siguiente(){
-        if(indiceActual<listaActual.contar()-1){
-            indiceActual++;
+        int total=listaActual.contar();
+        if(total>0){
+            indiceActual=(indiceActual+1)%total;
         }
     }
 
     public void anterior(){
-        if(indiceActual>0){
-            indiceActual--;
+        int total=listaActual.contar();
+        if(total>0){
+            indiceActual=(indiceActual-1+total)%total;
         }
+    }
+
+    //Filtra por atributo desde la lista base
+    public void filtrarPorAtributo(String atributo){
+        ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
+        int n=listaBase.contar();
+        for(int i=0;i<n;i++){
+            Carta c=listaBase.obtener(i);
+            if(c.getAtributo().name().equals(atributo)){
+                nueva.insertaFinal(c);
+            }
+        }
+        if(!nueva.estaVacia()){
+            listaActual=nueva;
+            indiceActual=0;
+        }
+    }
+
+    //Filtra por nivel específico desde la lista base
+    public void filtrarPorNivel(int nivel){
+        ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
+        int n=listaBase.contar();
+        for(int i=0;i<n;i++){
+            Carta c=listaBase.obtener(i);
+            if(c.getNivel()==nivel){
+                nueva.insertaFinal(c);
+            }
+        }
+        if(!nueva.estaVacia()){
+            listaActual=nueva;
+            indiceActual=0;
+        }
+    }
+
+    //Ordena la lista actual por nivel
+    public void ordenarListaActualPorNivel(boolean menorAMayor){
+        ordenarListaActual(menorAMayor?Carta.POR_NIVEL:Carta.POR_NIVEL.reversed());
+    }
+
+    //Ordena la lista actual por ataque
+    public void ordenarListaActualPorAtaque(boolean menorAMayor){
+        ordenarListaActual(menorAMayor?Carta.POR_ATAQUE:Carta.POR_ATAQUE.reversed());
+    }
+
+    //Ordena la lista actual por defensa
+    public void ordenarListaActualPorDefensa(boolean menorAMayor){
+        ordenarListaActual(menorAMayor?Carta.POR_DEFENSA:Carta.POR_DEFENSA.reversed());
+    }
+
+    //Ordena la lista actual usando un comparador
+    private void ordenarListaActual(Comparator<Carta> comparador){
+        if(listaActual.estaVacia()) return;
+
+        ArrayList<Carta> temp=new ArrayList<>();
+        int n=listaActual.contar();
+        for(int i=0;i<n;i++){
+            temp.add(listaActual.obtener(i));
+        }
+
+        Collections.sort(temp,comparador);
+
+        ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
+        for(Carta c:temp){
+            nueva.insertaFinal(c);
+        }
+        listaActual=nueva;
+        indiceActual=0;
     }
 
     public ListaCircularDoble<Carta> getListaTodas(){

@@ -8,9 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 
 /**
  * Pantalla principal donde se muestran las cartas y los controles.
@@ -21,115 +21,166 @@ public class PantallaPrincipal extends BorderPane{
     private Label lblNombre;
     private Label lblInfo;
     private Label lblContador;
+    private Label lblGuia;
     private HBox zonaCartas;
+    private boolean silenciado=false;
 
     public PantallaPrincipal(ControladorVista controlador){
         this.controlador=controlador;
-        this.setStyle("-fx-background-color:#0d3b2e;");
+
+        //Fondo
+        try{
+            Image fondo=new Image(getClass().getResource("/background/yugioh.jpg").toExternalForm());
+            BackgroundImage bg=new BackgroundImage(fondo,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,new BackgroundSize(BackgroundSize.AUTO,BackgroundSize.AUTO,false,false,true,true));
+            this.setBackground(new Background(bg));
+        }catch(Exception e){
+            this.setStyle("-fx-background-color:#1a1a1a;");
+        }
 
         VBox panelFiltros=crearPanelFiltros();
 
-        Button btnAnterior=new Button("Anterior");
-        Button btnSiguiente=new Button("Siguiente");
+        //Contenedor con margen para que el panel no toque los bordes
+        StackPane contenedorPanel=new StackPane(panelFiltros);
+        contenedorPanel.setPadding(new Insets(25,0,25,25));
+        contenedorPanel.setAlignment(Pos.TOP_LEFT);
 
-        btnAnterior.setOnAction(e->{
-            controlador.anterior();
-            actualizar();
+        //Botón de sonido
+        Button btnSonido=new Button("🔊");
+        btnSonido.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:18px; -fx-background-radius:25; -fx-padding:10 14; -fx-border-color:#c9a227; -fx-border-width:2;");
+        btnSonido.setOnAction(e->{
+            silenciado=!silenciado;
+            if(silenciado){
+                controlador.silenciar();
+                btnSonido.setText("🔇");
+            }else{
+                controlador.activarSonido();
+                btnSonido.setText("🔊");
+            }
         });
 
-        btnSiguiente.setOnAction(e->{
-            controlador.siguiente();
-            actualizar();
-        });
+        lblGuia=new Label("Dale clic a las cartas laterales para avanzar o retroceder");
+        lblGuia.setStyle("-fx-text-fill:#f5e6c8; -fx-font-size:16px; -fx-font-weight:bold; -fx-effect:dropshadow(gaussian,black,3,0,0,1);");
 
         lblNombre=new Label();
-        lblNombre.setStyle("-fx-text-fill:white; -fx-font-size:22px; -fx-font-weight:bold;");
+        lblNombre.setStyle("-fx-text-fill:#f5e6c8; -fx-font-size:28px; -fx-font-weight:bold; -fx-effect:dropshadow(gaussian,black,6,0,0,3);");
         lblInfo=new Label();
-        lblInfo.setStyle("-fx-text-fill:#a0d8ef; -fx-font-size:15px;");
+        lblInfo.setStyle("-fx-text-fill:#ffd700; -fx-font-size:18px; -fx-font-weight:bold;");
         lblContador=new Label();
-        lblContador.setStyle("-fx-text-fill:white; -fx-font-size:16px;");
+        lblContador.setStyle("-fx-text-fill:#f5e6c8; -fx-font-size:20px;");
 
-        zonaCartas=new HBox(25);
+        zonaCartas=new HBox(40);
         zonaCartas.setAlignment(Pos.CENTER);
 
-        VBox centro=new VBox(20,zonaCartas,lblNombre,lblInfo,lblContador);
+        VBox centro=new VBox(20,lblGuia,zonaCartas,lblNombre,lblInfo,lblContador);
         centro.setAlignment(Pos.CENTER);
 
-        HBox botones=new HBox(20,btnAnterior,btnSiguiente);
-        botones.setAlignment(Pos.CENTER);
-        botones.setPadding(new Insets(0,0,20,0));
+        HBox top=new HBox(btnSonido);
+        top.setAlignment(Pos.TOP_RIGHT);
+        top.setPadding(new Insets(20,25,0,0));
 
-        this.setLeft(panelFiltros);
+        this.setLeft(contenedorPanel);
         this.setCenter(centro);
-        this.setBottom(botones);
+        this.setTop(top);
 
         actualizar();
     }
 
+    private void estiloBoton(Button btn){
+        btn.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:15px; -fx-font-weight:bold; -fx-padding:10 22; -fx-background-radius:8; -fx-border-color:#c9a227; -fx-border-width:2;");
+    }
+
+    private void estiloCombo(ComboBox<String> combo){
+        combo.setStyle("-fx-background-color:#1a1a1a; -fx-border-color:#c9a227; -fx-border-radius:6; -fx-background-radius:6;");
+        combo.setButtonCell(new javafx.scene.control.ListCell<String>(){
+            @Override
+            protected void updateItem(String item,boolean empty){
+                super.updateItem(item,empty);
+                if(empty||item==null){
+                    setText(combo.getPromptText());
+                    setTextFill(javafx.scene.paint.Color.web("#c9a227"));
+                }else{
+                    setText(item);
+                    setTextFill(javafx.scene.paint.Color.web("#c9a227"));
+                }
+                setAlignment(Pos.CENTER);
+                setStyle("-fx-background-color:transparent; -fx-font-size:14px;");
+            }
+        });
+    }
+
     private VBox crearPanelFiltros(){
-        VBox panel=new VBox(15);
-        panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color:#0a2f26;");
+        VBox panel=new VBox(18);
+        panel.setPadding(new Insets(25));
+        panel.setStyle("-fx-background-color:#111111; -fx-background-radius:15; -fx-border-color:#c9a227; -fx-border-width:3; -fx-border-radius:15;");
         panel.setAlignment(Pos.TOP_CENTER);
+        panel.setPrefWidth(320);
+        panel.setMaxWidth(320);
 
         Button btnTodas=new Button("Todas las cartas");
+        estiloBoton(btnTodas);
+        btnTodas.setPrefWidth(250);
         btnTodas.setOnAction(e->{
             controlador.setListaActual(controlador.getListaTodas());
             actualizar();
         });
 
         ComboBox<String> comboNivel=new ComboBox<>();
-        comboNivel.getItems().addAll("Menor a mayor","Mayor a menor");
-        Button btnNivel=new Button("Por nivel");
+        comboNivel.getItems().addAll("Nivel 1","Nivel 2","Nivel 3","Nivel 4","Nivel 5","Nivel 6","Nivel 7","Nivel 8","Nivel 9","Nivel 10","Nivel 11","Nivel 12","Menor a mayor","Mayor a menor");
+        comboNivel.setPromptText("Nivel o orden");
+        comboNivel.setPrefWidth(250);
+        estiloCombo(comboNivel);
+        Button btnNivel=new Button("Filtrar / Ordenar nivel");
+        estiloBoton(btnNivel);
+        btnNivel.setPrefWidth(250);
         btnNivel.setOnAction(e->{
             String sel=comboNivel.getValue();
-            if("Menor a mayor".equals(sel)){
-                controlador.setListaActual(controlador.getListaNivelMenorMayor());
-            }else{
-                controlador.setListaActual(controlador.getListaNivelMayorMenor());
-            }
-            actualizar();
-        });
-
-        ComboBox<String> comboAtributo=new ComboBox<>();
-        comboAtributo.getItems().addAll("DARK","LIGHT","EARTH","WATER","FIRE","WIND","SPELL","TRAP");
-        Button btnAtributo=new Button("Por atributo");
-        btnAtributo.setOnAction(e->{
-            String sel=comboAtributo.getValue();
             if(sel!=null){
-                switch(sel){
-                    case "DARK": controlador.setListaActual(controlador.getListaDark()); break;
-                    case "LIGHT": controlador.setListaActual(controlador.getListaLight()); break;
-                    case "EARTH": controlador.setListaActual(controlador.getListaEarth()); break;
-                    case "WATER": controlador.setListaActual(controlador.getListaWater()); break;
-                    case "FIRE": controlador.setListaActual(controlador.getListaFire()); break;
-                    case "WIND": controlador.setListaActual(controlador.getListaWind()); break;
-                    case "SPELL": controlador.setListaActual(controlador.getListaSpell()); break;
-                    case "TRAP": controlador.setListaActual(controlador.getListaTrap()); break;
+                if(sel.startsWith("Nivel")){
+                    int nivel=Integer.parseInt(sel.replace("Nivel ",""));
+                    controlador.filtrarPorNivel(nivel);
+                }else if(sel.equals("Menor a mayor")){
+                    controlador.ordenarListaActualPorNivel(true);
+                }else if(sel.equals("Mayor a menor")){
+                    controlador.ordenarListaActualPorNivel(false);
                 }
                 actualizar();
             }
         });
 
-        CheckBox chkAtaque=new CheckBox("Menor a mayor");
-        Button btnAtaque=new Button("Por ataque");
-        btnAtaque.setOnAction(e->{
-            if(chkAtaque.isSelected()){
-                controlador.setListaActual(controlador.getListaAtaqueMenorMayor());
-            }else{
-                controlador.setListaActual(controlador.getListaAtaqueMayorMenor());
+        ComboBox<String> comboAtributo=new ComboBox<>();
+        comboAtributo.getItems().addAll("DARK","LIGHT","EARTH","WATER","FIRE","WIND","SPELL","TRAP");
+        comboAtributo.setPromptText("Atributo");
+        comboAtributo.setPrefWidth(250);
+        estiloCombo(comboAtributo);
+        Button btnAtributo=new Button("Filtrar por atributo");
+        estiloBoton(btnAtributo);
+        btnAtributo.setPrefWidth(250);
+        btnAtributo.setOnAction(e->{
+            String sel=comboAtributo.getValue();
+            if(sel!=null){
+                controlador.filtrarPorAtributo(sel);
+                actualizar();
             }
+        });
+
+        CheckBox chkAtaque=new CheckBox("Menor a mayor");
+        chkAtaque.setStyle("-fx-text-fill:#f5e6c8; -fx-font-size:14px;");
+        Button btnAtaque=new Button("Ordenar por ataque");
+        estiloBoton(btnAtaque);
+        btnAtaque.setPrefWidth(250);
+        btnAtaque.setOnAction(e->{
+            controlador.ordenarListaActualPorAtaque(chkAtaque.isSelected());
             actualizar();
         });
 
         CheckBox chkDefensa=new CheckBox("Menor a mayor");
-        Button btnDefensa=new Button("Por defensa");
+        chkDefensa.setStyle("-fx-text-fill:#f5e6c8; -fx-font-size:14px;");
+        Button btnDefensa=new Button("Ordenar por defensa");
+        estiloBoton(btnDefensa);
+        btnDefensa.setPrefWidth(250);
         btnDefensa.setOnAction(e->{
-            if(chkDefensa.isSelected()){
-                controlador.setListaActual(controlador.getListaDefensaMenorMayor());
-            }else{
-                controlador.setListaActual(controlador.getListaDefensaMayorMenor());
-            }
+            controlador.ordenarListaActualPorDefensa(chkDefensa.isSelected());
             actualizar();
         });
 
@@ -145,28 +196,48 @@ public class PantallaPrincipal extends BorderPane{
 
         zonaCartas.getChildren().clear();
 
-        if(controlador.getIndiceActual()>0){
-            Carta ant=controlador.getListaActual().obtener(controlador.getIndiceActual()-1);
-            ImagenCarta imgAnt=new ImagenCarta(ant,130);
-            zonaCartas.getChildren().add(imgAnt.getImagen());
+        int total=controlador.getListaActual().contar();
+        int indice=controlador.getIndiceActual();
+
+        //Carta anterior (clicable)
+        int indiceAnt=(indice-1+total)%total;
+        Carta ant=controlador.getListaActual().obtener(indiceAnt);
+        if(ant!=null){
+            ImagenCarta imgAnt=new ImagenCarta(ant,180);
+            ImageView viewAnt=imgAnt.getImagen();
+            viewAnt.setOnMouseClicked(e->{
+                controlador.anterior();
+                actualizar();
+            });
+            viewAnt.setStyle("-fx-cursor:hand;");
+            zonaCartas.getChildren().add(viewAnt);
         }
 
-        ImagenCarta imgActual=new ImagenCarta(actual,240);
+        //Carta actual
+        ImagenCarta imgActual=new ImagenCarta(actual,320);
         zonaCartas.getChildren().add(imgActual.getImagen());
 
-        if(controlador.getIndiceActual()<controlador.getListaActual().contar()-1){
-            Carta sig=controlador.getListaActual().obtener(controlador.getIndiceActual()+1);
-            ImagenCarta imgSig=new ImagenCarta(sig,130);
-            zonaCartas.getChildren().add(imgSig.getImagen());
+        //Carta siguiente (clicable)
+        int indiceSig=(indice+1)%total;
+        Carta sig=controlador.getListaActual().obtener(indiceSig);
+        if(sig!=null){
+            ImagenCarta imgSig=new ImagenCarta(sig,180);
+            ImageView viewSig=imgSig.getImagen();
+            viewSig.setOnMouseClicked(e->{
+                controlador.siguiente();
+                actualizar();
+            });
+            viewSig.setStyle("-fx-cursor:hand;");
+            zonaCartas.getChildren().add(viewSig);
         }
 
         lblNombre.setText(actual.getNombre());
         String info=actual.getAtributo().name();
         if(actual.getAtributo()!=com.example.yugiohexplorer.modelo.TipoAtributo.SPELL &&
                 actual.getAtributo()!=com.example.yugiohexplorer.modelo.TipoAtributo.TRAP){
-            info+="  |  Nivel: "+actual.getNivel()+"  |  ATK: "+actual.getAtaque()+"  |  DEF: "+actual.getDefensa();
+            info+="   •   Nivel "+actual.getNivel()+"   •   ATK "+actual.getAtaque()+"   •   DEF "+actual.getDefensa();
         }
         lblInfo.setText(info);
-        lblContador.setText((controlador.getIndiceActual()+1)+" / "+controlador.getListaActual().contar());
+        lblContador.setText((indice+1)+" / "+total);
     }
 }
