@@ -205,16 +205,26 @@ public class ControladorVista{
     //Aplica los filtros actuales de nivel y atributo
     private void aplicarFiltros(){
         ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
-        int n=listaBase.contar();
-        for(int i=0;i<n;i++){
+        int total=listaBase.contar();
+
+        for(int i=0;i<total;i++){
             Carta c=listaBase.obtener(i);
-            boolean cumpleNivel=(filtroNivel==null)||(c.getNivel()==filtroNivel)||
-                    (c.getAtributo()==TipoAtributo.SPELL)||(c.getAtributo()==TipoAtributo.TRAP);
-            boolean cumpleAtributo=(filtroAtributo==null)||(c.getAtributo().name().equals(filtroAtributo));
-            if(cumpleNivel&&cumpleAtributo){
-                nueva.insertaFinal(c);
+
+            //Si hay filtro de nivel, excluir nivel 0 y las que no coincidan
+            if(filtroNivel!=null){
+                if(c.getNivel()==0 || c.getNivel()!=filtroNivel){
+                    continue;
+                }
             }
+
+            //Filtro de atributo
+            if(filtroAtributo!=null && !c.getAtributo().name().equals(filtroAtributo)){
+                continue;
+            }
+
+            nueva.insertaFinal(c);
         }
+
         listaActual=nueva;
         indiceActual=0;
     }
@@ -227,11 +237,26 @@ public class ControladorVista{
 
     //Filtra por nivel específico
     public void filtrarPorNivel(int nivel){
+        ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
+        int total=listaBase.contar();
+
+        for(int i=0;i<total;i++){
+            Carta c=listaBase.obtener(i);
+
+            //Solo agregar si es el nivel correcto Y no es Spell ni Trap
+            if(c.getNivel()==nivel &&
+                    c.getAtributo()!=TipoAtributo.SPELL &&
+                    c.getAtributo()!=TipoAtributo.TRAP){
+                nueva.insertaFinal(c);
+            }
+        }
+
+        listaActual=nueva;
+        indiceActual=0;
         this.filtroNivel=nivel;
-        aplicarFiltros();
     }
 
-    //Ordena todas las cartas del atributo actual por nivel
+    //Ordena todas las cartas del atributo actual por nivel (quita el filtro de nivel)
     public void ordenarPorNivelSinFiltroNivel(boolean menorAMayor){
         this.filtroNivel=null;
         aplicarFiltros();
