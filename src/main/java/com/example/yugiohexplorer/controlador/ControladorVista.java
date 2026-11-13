@@ -127,4 +127,64 @@ public class ControladorVista{
             indiceActual--;
         }
     }
+
+    public ListaCircularDoble<Carta> getListaTodas(){
+        return listaTodas;
+    }
+
+    public ListaCircularDoble<Carta> getListaNivelMenorMayor(){
+        return listaNivelMenorMayor;
+    }
+
+    public ListaCircularDoble<Carta> getListaNivelMayorMenor(){
+        return listaNivelMayorMenor;
+    }
+
+    public ListaCircularDoble<Carta> getListaAtaqueMenorMayor(){
+        return listaAtaqueMenorMayor;
+    }
+
+    public ListaCircularDoble<Carta> getListaAtaqueMayorMenor(){
+        return listaAtaqueMayorMenor;
+    }
+
+    public ListaCircularDoble<Carta> getListaDefensaMenorMayor(){
+        return listaDefensaMenorMayor;
+    }
+
+    public ListaCircularDoble<Carta> getListaDefensaMayorMenor(){
+        return listaDefensaMayorMenor;
+    }
+
+    public ListaCircularDoble<Carta> getListaDark(){
+        return listaDark;
+    }
+
+    public ListaCircularDoble<Carta> getListaLight(){
+        return listaLight;
+    }
+
+    public ListaCircularDoble<Carta> getListaEarth(){
+        return listaEarth;
+    }
+
+    public ListaCircularDoble<Carta> getListaWater(){
+        return listaWater;
+    }
+
+    public ListaCircularDoble<Carta> getListaFire(){
+        return listaFire;
+    }
+
+    public ListaCircularDoble<Carta> getListaWind(){
+        return listaWind;
+    }
+
+    public ListaCircularDoble<Carta> getListaSpell(){
+        return listaSpell;
+    }
+
+    public ListaCircularDoble<Carta> getListaTrap(){
+        return listaTrap;
+    }
 }
