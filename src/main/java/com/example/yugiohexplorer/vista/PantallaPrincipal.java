@@ -47,7 +47,7 @@ public class PantallaPrincipal extends BorderPane{
 
         //Botón de sonido
         Button btnSonido=new Button("🔊");
-        btnSonido.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:18px; -fx-background-radius:25; -fx-padding:10 14; -fx-border-color:#c9a227; -fx-border-width:2;");
+        btnSonido.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:18px; -fx-background-radius:25; -fx-padding:10 14; -fx-border-color:#e74c3c; -fx-border-width:2;");
         btnSonido.setOnAction(e->{
             silenciado=!silenciado;
             if(silenciado){
@@ -87,21 +87,21 @@ public class PantallaPrincipal extends BorderPane{
     }
 
     private void estiloBoton(Button btn){
-        btn.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:15px; -fx-font-weight:bold; -fx-padding:10 22; -fx-background-radius:8; -fx-border-color:#c9a227; -fx-border-width:2;");
+        btn.setStyle("-fx-background-color:#111111; -fx-text-fill:#f5e6c8; -fx-font-size:15px; -fx-font-weight:bold; -fx-padding:10 22; -fx-background-radius:8; -fx-border-color:#e74c3c; -fx-border-width:2;");
     }
 
     private void estiloCombo(ComboBox<String> combo){
-        combo.setStyle("-fx-background-color:#1a1a1a; -fx-border-color:#c9a227; -fx-border-radius:6; -fx-background-radius:6;");
+        combo.setStyle("-fx-background-color:#1a1a1a; -fx-border-color:#e74c3c; -fx-border-radius:6; -fx-background-radius:6;");
         combo.setButtonCell(new javafx.scene.control.ListCell<String>(){
             @Override
             protected void updateItem(String item,boolean empty){
                 super.updateItem(item,empty);
                 if(empty||item==null){
                     setText(combo.getPromptText());
-                    setTextFill(javafx.scene.paint.Color.web("#c9a227"));
+                    setTextFill(javafx.scene.paint.Color.web("#e74c3c"));
                 }else{
                     setText(item);
-                    setTextFill(javafx.scene.paint.Color.web("#c9a227"));
+                    setTextFill(javafx.scene.paint.Color.web("#e74c3c"));
                 }
                 setAlignment(Pos.CENTER);
                 setStyle("-fx-background-color:transparent; -fx-font-size:14px;");
@@ -112,7 +112,7 @@ public class PantallaPrincipal extends BorderPane{
     private VBox crearPanelFiltros(){
         VBox panel=new VBox(18);
         panel.setPadding(new Insets(25));
-        panel.setStyle("-fx-background-color:#111111; -fx-background-radius:15; -fx-border-color:#c9a227; -fx-border-width:3; -fx-border-radius:15;");
+        panel.setStyle("-fx-background-color:#111111; -fx-background-radius:15; -fx-border-color:#e74c3c; -fx-border-width:3; -fx-border-radius:15;");
         panel.setAlignment(Pos.TOP_CENTER);
         panel.setPrefWidth(320);
         panel.setMaxWidth(320);

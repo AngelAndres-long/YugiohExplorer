@@ -5,7 +5,6 @@ import com.example.yugiohexplorer.modelo.ListaCircularDoble;
 import com.example.yugiohexplorer.modelo.TipoAtributo;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,7 +32,6 @@ public class ControladorVista{
     private ListaCircularDoble<Carta> listaWind;
     private ListaCircularDoble<Carta> listaSpell;
     private ListaCircularDoble<Carta> listaTrap;
-
     private ListaCircularDoble<Carta> listaActual;
     private ListaCircularDoble<Carta> listaBase;
     private int indiceActual=0;
@@ -256,7 +254,7 @@ public class ControladorVista{
         this.filtroNivel=nivel;
     }
 
-    //Ordena todas las cartas del atributo actual por nivel (quita el filtro de nivel)
+    //Ordena todas las cartas del atributo actual por nivel
     public void ordenarPorNivelSinFiltroNivel(boolean menorAMayor){
         this.filtroNivel=null;
         aplicarFiltros();
