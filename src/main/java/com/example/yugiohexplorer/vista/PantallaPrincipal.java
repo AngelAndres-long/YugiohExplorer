@@ -121,7 +121,7 @@ public class PantallaPrincipal extends BorderPane{
         estiloBoton(btnTodas);
         btnTodas.setPrefWidth(250);
         btnTodas.setOnAction(e->{
-            controlador.setListaActual(controlador.getListaTodas());
+            controlador.reiniciarFiltros();
             actualizar();
         });
 
@@ -140,9 +140,9 @@ public class PantallaPrincipal extends BorderPane{
                     int nivel=Integer.parseInt(sel.replace("Nivel ",""));
                     controlador.filtrarPorNivel(nivel);
                 }else if(sel.equals("Menor a mayor")){
-                    controlador.ordenarListaActualPorNivel(true);
+                    controlador.ordenarPorNivelSinFiltroNivel(true);
                 }else if(sel.equals("Mayor a menor")){
-                    controlador.ordenarListaActualPorNivel(false);
+                    controlador.ordenarPorNivelSinFiltroNivel(false);
                 }
                 actualizar();
             }
@@ -189,7 +189,13 @@ public class PantallaPrincipal extends BorderPane{
     }
 
     public void actualizar(){
-        if(controlador.getListaActual().estaVacia()) return;
+        if(controlador.getListaActual().estaVacia()){
+            zonaCartas.getChildren().clear();
+            lblNombre.setText("No hay cartas con esta combinación");
+            lblInfo.setText("");
+            lblContador.setText("0 / 0");
+            return;
+        }
 
         Carta actual=controlador.getListaActual().obtener(controlador.getIndiceActual());
         if(actual==null) return;

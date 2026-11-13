@@ -39,6 +39,10 @@ public class ControladorVista{
     private int indiceActual=0;
     private MediaPlayer reproductor;
 
+    //Filtros activos
+    private Integer filtroNivel=null;
+    private String filtroAtributo=null;
+
     public ControladorVista(){
         listaTodas=new ListaCircularDoble<>();
         listaNivelMenorMayor=new ListaCircularDoble<>();
@@ -180,6 +184,8 @@ public class ControladorVista{
         this.listaActual=lista;
         this.listaBase=lista;
         this.indiceActual=0;
+        this.filtroNivel=null;
+        this.filtroAtributo=null;
     }
 
     public void siguiente(){
@@ -196,36 +202,52 @@ public class ControladorVista{
         }
     }
 
-    //Filtra por atributo desde la lista base
-    public void filtrarPorAtributo(String atributo){
+    //Aplica los filtros actuales de nivel y atributo
+    private void aplicarFiltros(){
         ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
         int n=listaBase.contar();
         for(int i=0;i<n;i++){
             Carta c=listaBase.obtener(i);
-            if(c.getAtributo().name().equals(atributo)){
+            boolean cumpleNivel=(filtroNivel==null)||(c.getNivel()==filtroNivel)||
+                    (c.getAtributo()==TipoAtributo.SPELL)||(c.getAtributo()==TipoAtributo.TRAP);
+            boolean cumpleAtributo=(filtroAtributo==null)||(c.getAtributo().name().equals(filtroAtributo));
+            if(cumpleNivel&&cumpleAtributo){
                 nueva.insertaFinal(c);
             }
         }
-        if(!nueva.estaVacia()){
-            listaActual=nueva;
-            indiceActual=0;
-        }
+        listaActual=nueva;
+        indiceActual=0;
     }
 
-    //Filtra por nivel específico desde la lista base
+    //Filtra por atributo
+    public void filtrarPorAtributo(String atributo){
+        this.filtroAtributo=atributo;
+        aplicarFiltros();
+    }
+
+    //Filtra por nivel específico
     public void filtrarPorNivel(int nivel){
-        ListaCircularDoble<Carta> nueva=new ListaCircularDoble<>();
-        int n=listaBase.contar();
-        for(int i=0;i<n;i++){
-            Carta c=listaBase.obtener(i);
-            if(c.getNivel()==nivel){
-                nueva.insertaFinal(c);
-            }
-        }
-        if(!nueva.estaVacia()){
-            listaActual=nueva;
-            indiceActual=0;
-        }
+        this.filtroNivel=nivel;
+        aplicarFiltros();
+    }
+
+    //Ordena todas las cartas del atributo actual por nivel
+    public void ordenarPorNivelSinFiltroNivel(boolean menorAMayor){
+        this.filtroNivel=null;
+        aplicarFiltros();
+        ordenarListaActual(menorAMayor?Carta.POR_NIVEL:Carta.POR_NIVEL.reversed());
+    }
+
+    //Reinicia todos los filtros
+    public void reiniciarFiltros(){
+        this.filtroNivel=null;
+        this.filtroAtributo=null;
+        listaActual=listaBase;
+        indiceActual=0;
+    }
+
+    public boolean hayResultados(){
+        return !listaActual.estaVacia();
     }
 
     //Ordena la lista actual por nivel
