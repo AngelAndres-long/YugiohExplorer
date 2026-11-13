@@ -4,13 +4,13 @@ package com.example.yugiohexplorer.modelo;
  * Nodo para la lista circular doble.
  * Tiene referencia al anterior y al siguiente.
  */
-public class NodoCircular<T>{
+public class NodoDoble<T>{
 
     private T dato;
-    private NodoCircular<T> anterior;
-    private NodoCircular<T> siguiente;
+    private NodoDoble<T> anterior;
+    private NodoDoble<T> siguiente;
 
-    public NodoCircular(T dato){
+    public NodoDoble(T dato){
         this.dato=dato;
     }
 
@@ -22,19 +22,19 @@ public class NodoCircular<T>{
         this.dato=dato;
     }
 
-    public NodoCircular<T> getAnterior(){
+    public NodoDoble<T> getAnterior(){
         return anterior;
     }
 
-    public void setAnterior(NodoCircular<T> anterior){
+    public void setAnterior(NodoDoble<T> anterior){
         this.anterior=anterior;
     }
 
-    public NodoCircular<T> getSiguiente(){
+    public NodoDoble<T> getSiguiente(){
         return siguiente;
     }
 
-    public void setSiguiente(NodoCircular<T> siguiente){
+    public void setSiguiente(NodoDoble<T> siguiente){
         this.siguiente=siguiente;
     }
 }
